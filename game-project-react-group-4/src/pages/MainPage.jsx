@@ -9,7 +9,12 @@ const MainPage = () => {
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
+  const attackDamage = 5;
+  const [player1AttackCount, setPlayer1AttackCount] = useState(1);
+  const [player2AttackCount, setPlayer2AttackCount] = useState(1);
+
   // a list of dictionaries
+
   const players = [
 
     // this is a dictionary or object in JavaScript for player 1
@@ -17,27 +22,40 @@ const MainPage = () => {
     {
       name: "Lannour",
       control: "KeyW",
+      attack: "KeyS",
+      attackCount: player1AttackCount,
       score: player1Score,
     },
     {
       name: "Sencio",
       control: "ArrowUp",
+      attack: "ArrowDown",
+      attackCount: player2AttackCount,
       score: player2Score,
     },
   ];
 
+
   // map function for displaying the scoreboard.
   // design the scoreboard here
   const listScoreboard = players.map((player, index) => 
-    <div key={index}>
+    <div key={index} className='text-white'>
       {player.name} Score: {player.score}
       </div>)
+
+  // an rng in gaining points
+  const pointRNG = () => {
+    const points = [1, 1, 1, 1, 1, 2, 2, 3]
+    return points[Math.floor(Math.random() * points.length)]
+  }
 
   // a use effect function
   // this use effect will run when the app is rendered
   useEffect(() => {
+    console.log(player1AttackCount)
     // a function that handles score changes
     const handleAddScore = (event) => {
+      // if there's already a winner, no one is getting points anymore
       if (!isPlaying) {
         return;
       }
@@ -46,10 +64,20 @@ const MainPage = () => {
         if (event.code === players[0].control) {
           console.log(isPlaying)
           // the setState will add his score by one
-          setPlayer1Score(s => s + 1);
-      // similar logic (default key=Arrow Up)
-        } else if (event.code === players[1].control) {
-          setPlayer2Score(s => s + 1)
+          setPlayer1Score(s => s + pointRNG());
+        }
+        // similar logic (default key=Arrow Up)
+        if (event.code === players[1].control) {
+          setPlayer2Score(s => s + pointRNG());
+        }
+
+        if (event.code === players[0].attack && players[0].attackCount !== 0){
+          setPlayer2Score(s => s - attackDamage);
+          setPlayer1AttackCount(atk => atk - 1)
+        }
+        if (event.code === players[1].attack && players[1].attackCount !== 0) {
+          setPlayer1Score(s => s - attackDamage);
+          setPlayer2AttackCount(atk => atk - 1)
         }
     }   
 
@@ -63,7 +91,7 @@ const MainPage = () => {
     return () => {
         window.removeEventListener("keyup", handleAddScore);
     }
-  }, [isPlaying]);
+  }, [isPlaying, player1AttackCount, player2AttackCount]);
 
   // check for winners
   useEffect(() => {
