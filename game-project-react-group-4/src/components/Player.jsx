@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { backInOut, motion } from 'motion/react'
 
 const Player = (props) => {
-    const { playerName, playerControl } = props
-
+    const { playerName, playerControl, attackControl } = props
 
     // design the player cards
     return (
@@ -21,11 +20,16 @@ const Player = (props) => {
             duration: .2,
             ease: backInOut,
         }}
-        className='flex flex-col items-center gap-2 px-20 py-40 bg-stone-950 rounded-2xl'>
+        className='flex flex-col items-center gap-2 px-20 py-20 bg-stone-950 rounded-2xl'>
             <h4 className='text-sm text-gray-400'>Player</h4>
             <h5>{playerName}</h5>
             <motion.h4 
-            className='p-10 bg-zinc-800 rounded-2xl'>{playerControl}</motion.h4>
+            className='p-10 bg-zinc-800 rounded-2xl'>{playerControl}
+            </motion.h4>
+            <h4 
+            className='p-6 bg-red-700 rounded-xl text-sm'>
+                {attackControl}
+            </h4>
         </motion.div>
     );
 }

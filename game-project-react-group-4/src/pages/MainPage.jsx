@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
 import Scoreboard from '../components/Scoreboard';
+import { motion } from 'motion/react'
 
 const MainPage = () => {
 
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isShowingWinner, setIsShowingWinner] = useState(false);
 
   // set a state variables for player 1 and player 2
   const [player1Score, setPlayer1Score] = useState(0);
@@ -47,7 +49,12 @@ const MainPage = () => {
   // design the scoreboard here
   const listScoreboard = players.map((player, index) => 
     <div key={index} className='text-white'>
-      {player.name} Score: {player.score}
+      <h5 className='text-gray-500 font-semibold text-lg'>
+        {player.name} 
+      </h5>
+      <h1 className='text-white font-bold text-4xl p-5'>
+        {player.score}
+      </h1>
       </div>)
 
   // an rng in gaining points
@@ -104,6 +111,7 @@ const MainPage = () => {
           winner: player.name,
         })
 
+        handleShowWinner();
         setIsPlaying(false);
       }
     }
@@ -116,20 +124,51 @@ const MainPage = () => {
       player.setAttackCount(1);
     })
   }
+
+  const handleShowWinner = () => {
+    setIsShowingWinner(true);
+
+    setTimeout(() => {
+      setIsShowingWinner(false);
+    }, 3000);
+  }
   // the renders in VDOM
   return (
     <div className='w-full flex flex-col items-center'>
       <Scoreboard winnerInfo={winnerInfo}/>
-      {listScoreboard}
+
+      {isShowingWinner && 
+      <motion.div
+      animate={{
+        translateY: 20
+      }}
+      exit={{
+        translateY: 0
+      }}
+      className='absolute top-10 flex flex-col px-40 py-2 bg-stone-950 rounded-xl items-center'>
+        <h5 className='font-semibold text-gray-700'>
+          Winner: 
+        </h5>
+        <h2 className='font-bold text-green-400 text-4xl'>
+          {winnerInfo.winner}
+        </h2>
+      </motion.div>}
+
+      <div 
+      className='flex flex-row mt-20 w-[50vw] justify-between mx-auto'>
+        {listScoreboard}
+      </div>
 
       <div className='flex flex-row justify-between text-2xl font-bold text-white mt-[20vh] w-[50vw] mx-auto'>
-        <Player playerName={players[0].name} playerControl={"W"}/>
-        <Player playerName={players[1].name} playerControl={"Up"}/>
+        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"}/>
+        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"}/>
       </div>
 
       <button 
       onClick={resetGame}
-      className='bg-green-400 text-white font-bold w-10 h-10 text-2xl mt-5 rounded-2xl'>R</button>
+      className='bg-orange-400 text-black font-semibold p-2 mt-5 rounded-xl cursor-pointer
+                  absolute left-0 top-10 m-2
+      '>RESET</button>
     </div>
   )
 }
