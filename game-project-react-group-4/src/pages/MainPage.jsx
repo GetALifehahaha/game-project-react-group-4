@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
+import Scoreboard from '../components/Scoreboard';
 
 const MainPage = () => {
 
@@ -13,6 +14,8 @@ const MainPage = () => {
   const [player1AttackCount, setPlayer1AttackCount] = useState(1);
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
 
+  const [winnerInfo, setWinnerInfo] = useState({});
+
   // a list of dictionaries
 
   const players = [
@@ -24,14 +27,18 @@ const MainPage = () => {
       control: "KeyW",
       attack: "KeyS",
       attackCount: player1AttackCount,
+      setAttackCount: setPlayer1AttackCount,
       score: player1Score,
+      setScore: setPlayer1Score
     },
     {
       name: "Sencio",
       control: "ArrowUp",
       attack: "ArrowDown",
       attackCount: player2AttackCount,
+      setAttackCount: setPlayer2AttackCount,
       score: player2Score,
+      setScore: setPlayer2Score
     },
   ];
 
@@ -52,37 +59,28 @@ const MainPage = () => {
   // a use effect function
   // this use effect will run when the app is rendered
   useEffect(() => {
-    console.log(player1AttackCount)
-    // a function that handles score changes
-    const handleAddScore = (event) => {
-      // if there's already a winner, no one is getting points anymore
-      if (!isPlaying) {
+    const handleAddScore = (event) => { // a function that handles score changes
+      
+      if (!isPlaying) { // if there's already a winner, no one is getting points anymore
         return;
       }
 
-      // if the player 1 hits his key (default=W)
-        if (event.code === players[0].control) {
-          console.log(isPlaying)
-          // the setState will add his score by one
-          setPlayer1Score(s => s + pointRNG());
-        }
-        // similar logic (default key=Arrow Up)
-        if (event.code === players[1].control) {
-          setPlayer2Score(s => s + pointRNG());
+      players.forEach((player, index) => {
+        const opponentIndex = index === 1 ? 0 : 1;
+
+        if (player.control == event.code) {
+          player.setScore(s => s + pointRNG())
         }
 
-        if (event.code === players[0].attack && players[0].attackCount !== 0){
-          setPlayer2Score(s => s - attackDamage);
-          setPlayer1AttackCount(atk => atk - 1)
+        if (player.attack == event.code && player.attackCount != 0) {
+          players[opponentIndex].setScore(s => s - 5)
+          player.setAttackCount(0)
         }
-        if (event.code === players[1].attack && players[1].attackCount !== 0) {
-          setPlayer1Score(s => s - attackDamage);
-          setPlayer2AttackCount(atk => atk - 1)
-        }
+      })
     }   
 
-    // add an event listener to listen to key presses
-    window.addEventListener("keyup", handleAddScore);
+    
+    window.addEventListener("keyup", handleAddScore); // add an event listener to listen to key presses
 
     // a garbage collector that will prevent duplicate listeners
     // each rerender adds an event listener
@@ -95,27 +93,43 @@ const MainPage = () => {
 
   // check for winners
   useEffect(() => {
-    // iterate thru the list of players
-    for (const player of players) {
+    for (const player of players) { // iterate thru the list of players
       // if the score of disctionary in the list
       // render the name of the dictionary in the list
       // uhmmm sorry im bad english speak
-      if (player.score === 10) {
-        console.log(player.name + " won!")
+      if (player.score >= 10) {
+
+        // send the information to the Scoreboard component
+        setWinnerInfo({
+          winner: player.name,
+        })
+
         setIsPlaying(false);
       }
     }
   }, [player1Score, player2Score])
 
+  const resetGame = () => {
+    setIsPlaying(true);
+    players.forEach(player => {
+      player.setScore(0);
+      player.setAttackCount(1);
+    })
+  }
   // the renders in VDOM
   return (
-    <div className='w-full'>
+    <div className='w-full flex flex-col items-center'>
+      <Scoreboard winnerInfo={winnerInfo}/>
       {listScoreboard}
 
-      <div className='flex flex-row justify-between text-2xl font-bold text-white'>
-        <Player playerName={players[0].name} playerControl={players[0].control}/>
-        <Player playerName={players[1].name} playerControl={players[1].control}/>
+      <div className='flex flex-row justify-between text-2xl font-bold text-white mt-[20vh] w-[50vw] mx-auto'>
+        <Player playerName={players[0].name} playerControl={"W"}/>
+        <Player playerName={players[1].name} playerControl={"Up"}/>
       </div>
+
+      <button 
+      onClick={resetGame}
+      className='bg-green-400 text-white font-bold w-10 h-10 text-2xl mt-5 rounded-2xl'>R</button>
     </div>
   )
 }
