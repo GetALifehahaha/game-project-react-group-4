@@ -1,48 +1,36 @@
 import React, { useState, useEffect } from 'react'
+import { backInOut, motion } from 'motion/react'
 
 const Player = (props) => {
-    const { playerName, playerControl, onWin, attackSibling} = props
+    const { playerName, playerControl, attackControl } = props
 
-    const [score, setScore ] = useState(0);
-
-    useEffect(() => {
-        const handleAddScore = (event) => {
-            if (event.code === playerControl || event.code === attackSibling) {
-                setScore((s) => {
-                    if (s == 10) {
-                        return s;
-                    }
-
-                    if (event.code === playerControl) {
-                        return s + 1;
-                    } else if (event.code === attackSibling){
-                        return s - 1;
-                    }
-                });
-            }
-        }   
-
-        window.addEventListener("keyup", handleAddScore);
-
-        return () => {
-            window.removeEventListener("keyup", handleAddScore);
-        }
-    }, [playerControl]);
-
-    useEffect(() => {
-        if (score === 10) {
-            onWin(playerName)
-        }
-    }, [score]);
-
-    
-    
-
+    // design the player cards
     return (
-        <div>
-            <h1>{score}</h1> {/* scoreboard goes here */}
+        <motion.div 
+        initial = {{
+            translateY: -20
+        }}
+        animate = {{
+            translateY: 0
+        }}
+        whileHover={{
+            scale: 1.1
+        }}
+        transition={{
+            duration: .2,
+            ease: backInOut,
+        }}
+        className='flex flex-col items-center gap-2 px-20 py-20 bg-stone-950 rounded-2xl'>
+            <h4 className='text-sm text-gray-400'>Player</h4>
             <h5>{playerName}</h5>
-        </div>
+            <motion.h4 
+            className='p-10 bg-zinc-800 rounded-2xl'>{playerControl}
+            </motion.h4>
+            <h4 
+            className='p-6 bg-red-700 rounded-xl text-sm'>
+                {attackControl}
+            </h4>
+        </motion.div>
     );
 }
 
