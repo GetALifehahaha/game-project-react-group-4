@@ -9,6 +9,9 @@ const MainPage = () => {
   const [isShowingWinner, setIsShowingWinner] = useState(false);
 
   // set a state variables for player 1 and player 2
+  const [player1Name, setPlayer1Name] = useState("Player 1");
+  const [player2Name, setPlayer2Name] = useState("Player 2");
+
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
@@ -18,6 +21,7 @@ const MainPage = () => {
 
   const [winnerInfo, setWinnerInfo] = useState({});
   const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
+  const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
   
 
@@ -28,7 +32,7 @@ const MainPage = () => {
     // this is a dictionary or object in JavaScript for player 1
     // this contains the player name, key control, and the score which uses the state variables 
     {
-      name: "Lannour",
+      name: player1Name,
       control: "KeyW",
       attack: "KeyS",
       attackCount: player1AttackCount,
@@ -37,7 +41,7 @@ const MainPage = () => {
       setScore: setPlayer1Score
     },
     {
-      name: "Sencio",
+      name: player2Name,
       control: "ArrowUp",
       attack: "ArrowDown",
       attackCount: player2AttackCount,
@@ -69,7 +73,7 @@ const MainPage = () => {
   useEffect(() => {
     const handleAddScore = (event) => { // a function that handles score changes
       
-      if (!isPlaying) { // if there's already a winner, no one is getting points anymore
+      if (!isPlaying || settingsIsOpen) {
         return;
       }
 
@@ -97,7 +101,7 @@ const MainPage = () => {
     return () => {
         window.removeEventListener("keyup", handleAddScore);
     }
-  }, [isPlaying, player1AttackCount, player2AttackCount]);
+  }, [isPlaying, settingsIsOpen, player1AttackCount, player2AttackCount]);
 
   // check for winners
   useEffect(() => {
@@ -134,12 +138,42 @@ const MainPage = () => {
     }, 3000);
   }
 
+  const handleSetPlayer1Name = (event) => {
+    setPlayer1Name(event.target.value)
+  }
+  
+  const handleSetPlayer2Name = (event) => {
+    setPlayer2Name(event.target.value)
+  }
+
   const handleSetScoreboardIsOpen = () => {
-      setScoreboardIsOpen(!scoreboardIsOpen);
-    }
-  // the renders in VDOM
+    setScoreboardIsOpen(!scoreboardIsOpen);
+  }
+
+  const handleSetSettingsIsOpen = () => {
+    setSettingsIsOpen(!settingsIsOpen);
+  }
+    // the renders in VDOM
   return (
     <div className='w-full flex flex-col items-center'>
+      {settingsIsOpen && 
+        <div className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
+          <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
+
+          <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
+            <h1 className='text-gray-400 pb-2'>Name</h1>
+            <label for='player1Name' className='text-sm text-black'>Set Player 1 Name</label>
+            <input type="text" id='player1Name' placeholder='Input player 1 name' 
+              className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 text-black outline-none focus:border-nintendo-blue-500'
+              onChange={(e) => handleSetPlayer1Name(e)}/>
+            <label for='player1Name' className='text-sm text-black'>Set Player 2 Name</label>
+            <input type="text" id='player2Name' placeholder='Input player 2 name' 
+              className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 text-black outline-none focus:border-nintendo-blue-500'
+              onChange={(e) => handleSetPlayer2Name(e)}
+            />
+          </div>
+        </div>
+      }
       {scoreboardIsOpen && 
         <Scoreboard winnerInfo={winnerInfo}/>
       }
@@ -175,7 +209,12 @@ const MainPage = () => {
         <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"} playerNo={2}/>
       </div>
 
-      
+      <div className='h-auto w-full bg-black p-2 flex justify-center items-center'>
+        <button 
+        className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
+        onClick={handleSetSettingsIsOpen}
+        >Settings</button>
+      </div>
     </div>
   )
 }
