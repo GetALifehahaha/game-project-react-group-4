@@ -17,6 +17,9 @@ const MainPage = () => {
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
 
   const [winnerInfo, setWinnerInfo] = useState({});
+  const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
+
+  
 
   // a list of dictionaries
 
@@ -48,14 +51,12 @@ const MainPage = () => {
   // map function for displaying the scoreboard.
   // design the scoreboard here
   const listScoreboard = players.map((player, index) => 
-    <div key={index} className='text-white'>
-      <h5 className='text-gray-500 font-semibold text-lg'>
-        {player.name} 
-      </h5>
-      <h1 className='text-white font-bold text-4xl p-5'>
+    <div key={index} className={`text-white ${index===0 ? 'bg-nintendo-blue-500' : 'bg-nintendo-red-1'} flex-1 p-8 flex flex-col justify-center items-center gap-2`}>
+      <h3 className='text-2xl'>SCORE</h3>
+      <h1 className={`text-black font-bold text-4xl p-5 w-30 py-12 text-center bg-white border-8 border-black rounded-xl shadow-sm shadow-black`}>
         {player.score}
       </h1>
-      </div>)
+    </div>)
 
   // an rng in gaining points
   const pointRNG = () => {
@@ -132,10 +133,16 @@ const MainPage = () => {
       setIsShowingWinner(false);
     }, 3000);
   }
+
+  const handleSetScoreboardIsOpen = () => {
+      setScoreboardIsOpen(!scoreboardIsOpen);
+    }
   // the renders in VDOM
   return (
     <div className='w-full flex flex-col items-center'>
-      <Scoreboard winnerInfo={winnerInfo}/>
+      {scoreboardIsOpen && 
+        <Scoreboard winnerInfo={winnerInfo}/>
+      }
 
       {isShowingWinner && 
       <motion.div
@@ -154,21 +161,21 @@ const MainPage = () => {
         </h2>
       </motion.div>}
 
-      <div 
-      className='flex flex-row mt-20 w-[50vw] justify-between mx-auto'>
+      <div className='bg-black w-full p-4 flex justify-evenly items-center'>
+        <button onClick={resetGame} className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</button>
+        <button className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' onClick={handleSetScoreboardIsOpen}>SCOREBOARD</button>
+      </div>
+
+      <div className='flex flex-row bg-white w-full justify-between mx-auto'>
         {listScoreboard}
       </div>
 
-      <div className='flex flex-row justify-between text-2xl font-bold text-white mt-[20vh] w-[50vw] mx-auto'>
-        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"}/>
-        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"}/>
+      <div className={`flex flex-row justify-between w-full`}>
+        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"} playerNo={1}/>
+        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"} playerNo={2}/>
       </div>
 
-      <button 
-      onClick={resetGame}
-      className='bg-orange-400 text-black font-semibold p-2 mt-5 rounded-xl cursor-pointer
-                  absolute left-0 top-10 m-2
-      '>RESET</button>
+      
     </div>
   )
 }

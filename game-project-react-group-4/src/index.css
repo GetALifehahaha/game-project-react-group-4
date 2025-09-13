@@ -1,5 +1,25 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'SprinturaDemo';
+  src: url('assets/SprinturaDemo.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@theme {
+  --color-nintendo-blue-500: #2A7CCD;
+  --color-nintendo-blue-550: #0077ff;
+  --color-nintendo-red-1: #c92b2d;
+  --color-nintendo-red-2: #ff0000;
+  --color-nintendo-red-3: #d91515;
+  --color-nintendo-red-4: #e11b1b;
+  --color-nintendo-red-5: #800000;
+  --color-nintendo-gray: #b8b7b7;
+  --color-nintendo-white: #ffffff;
+}
+
 body{
   background-color: rgb(27, 27, 37);
+  font-family: 'SprinturaDemo';
 }
