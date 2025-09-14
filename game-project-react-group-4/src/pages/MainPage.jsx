@@ -9,17 +9,14 @@ const MainPage = () => {
   const [isShowingWinner, setIsShowingWinner] = useState(false);
 
   // set a state variables for player 1 and player 2
-  const [player1Name, setPlayer1Name] = useState("Player 1");
-  const [player2Name, setPlayer2Name] = useState("Player 2");
+  const [player1Name, setPlayer1Name] = useState("Ar-rauf");
+  const [player2Name, setPlayer2Name] = useState("Imar");
 
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
   const [latestPlayer1Score, setLatestPlayer1Score] = useState(0);
   const [latestPlayer2Score, setLatestPlayer2Score] = useState(0);
-
-  const [latestPlayer1Deduction, setLatestPlayer1Deduction] = useState(0);
-  const [latestPlayer2Deduction, setLatestPlayer2Deduction] = useState(0);
 
   const attackDamage = 5;
   const [player1AttackCount, setPlayer1AttackCount] = useState(1);
@@ -184,7 +181,6 @@ const MainPage = () => {
       // uhmmm sorry im bad english speak
       if (player.score >= 10) {
 
-        // send the information to the Scoreboard component
         setWinnerInfo({
           winner: player.name,
         });
