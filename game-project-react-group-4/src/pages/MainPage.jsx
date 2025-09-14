@@ -159,7 +159,7 @@ const MainPage = () => {
   }
     // the renders in VDOM
   return (
-    <div className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center'>
+    <div className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center relative'>
       <AnimatePresence>
         {settingsIsOpen && 
           <motion.div 
@@ -237,8 +237,24 @@ const MainPage = () => {
         ease: 'backOut'
       }}
       className='bg-black w-full p-4 flex justify-evenly items-center'>
-        <button onClick={resetGame} className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</button>
-        <button className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' onClick={handleSetScoreboardIsOpen}>SCOREBOARD</button>
+        <motion.button 
+        onClick={resetGame}
+        whileHover={{
+          scale: 1.1
+        }} 
+        whileTap={{
+          y: -5
+        }}
+        className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</motion.button>
+        <motion.button
+        whileHover={{
+          scale: 1.1,
+        }}
+        whileTap={{
+          y: -5
+        }}
+         className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' 
+         onClick={handleSetScoreboardIsOpen}>SCOREBOARD</motion.button>
       </motion.div>
 
       <motion.div 
@@ -274,8 +290,8 @@ const MainPage = () => {
         delay: .4
       }}
       className={`flex flex-row justify-between w-full`}>
-        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"} playerNo={1}/>
-        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"} playerNo={2}/>
+        <Player playerName={players[0].name} playerControl={"KeyW"} attackControl={"S"} playerNo={1}/>
+        <Player playerName={players[1].name} playerControl={"ArrowUp"} attackControl={"Down"} playerNo={2}/>
       </motion.div>
 
       <motion.div 
@@ -293,10 +309,16 @@ const MainPage = () => {
         delay: .6
       }}
       className='h-auto w-full bg-black p-2 flex justify-center items-center'>
-        <button 
+        <motion.button 
         className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
         onClick={handleSetSettingsIsOpen}
-        >Settings</button>
+        whileHover={{
+          scale: 1.1
+        }}
+        whileTap={{
+          y: -5
+        }}
+        >Settings</motion.button>
       </motion.div>
     </div>
   )
