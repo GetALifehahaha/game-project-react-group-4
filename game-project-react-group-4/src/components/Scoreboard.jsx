@@ -37,7 +37,7 @@ const Scoreboard = (props) => {
         duration: .2,
         ease: 'anticipate'
       }} 
-      className='text-white absolute right-0 p-4 w-[20vw] h-full bg-white'>
+      className='text-white right-0 p-4 w-[20vw] h-full bg-white'>
         <h3 className='text-black font-semibold text-xl text-center pb-4'>Scoreboard</h3>
         <h5 className='text-gray-400 font-semibold pb-4'>Winners</h5>
         <div className='overflow-auto h-[80vh] bg-gray-100 py-4 px-1 rounded-sm shadow-sm'>
