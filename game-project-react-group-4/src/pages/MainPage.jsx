@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
 import Scoreboard from '../components/Scoreboard';
-import { AnimatePresence, easeInOut, easeOut, motion, stagger } from 'motion/react'
+import { AnimatePresence, motion, useAnimationControls } from 'motion/react'
 
 const MainPage = () => {
 
@@ -15,6 +15,12 @@ const MainPage = () => {
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
+  const [latestPlayer1Score, setLatestPlayer1Score] = useState(0);
+  const [latestPlayer2Score, setLatestPlayer2Score] = useState(0);
+
+  const [latestPlayer1Deduction, setLatestPlayer1Deduction] = useState(0);
+  const [latestPlayer2Deduction, setLatestPlayer2Deduction] = useState(0);
+
   const attackDamage = 5;
   const [player1AttackCount, setPlayer1AttackCount] = useState(1);
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
@@ -23,7 +29,42 @@ const MainPage = () => {
   const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
   const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
-  
+  const scoreAnimationVariants = {
+    initial: {
+      opacity: 0,
+      y: 0,
+    },
+    show: {
+      opacity: [1, 0],
+      y: [0, -20],
+
+      transition: {
+        duration: '0.2',
+        ease: 'easeOut'
+      }
+    },
+    
+  }
+
+  const player1ScoreAnimationControls = useAnimationControls();
+  const player2ScoreAnimationControls = useAnimationControls();
+
+  const player1ScoreDeductionAnimationControls = useAnimationControls();
+  const player2ScoreDeductionAnimationControls = useAnimationControls();
+
+  const handlePlayer1ScoreAnimations = () => {
+    player1ScoreAnimationControls.start("show")
+  }
+  const handlePlayer2ScoreAnimations = () => {
+    player2ScoreAnimationControls.start("show")
+  }
+
+  const handlePlayer1ScoreDeductionAnimations = () => {
+    player1ScoreDeductionAnimationControls.start("show")
+  }
+  const handlePlayer2ScoreDeductionAnimations = () => {
+    player2ScoreDeductionAnimationControls.start("show")
+  }
 
   // a list of dictionaries
 
@@ -38,7 +79,13 @@ const MainPage = () => {
       attackCount: player1AttackCount,
       setAttackCount: setPlayer1AttackCount,
       score: player1Score,
-      setScore: setPlayer1Score 
+      setScore: setPlayer1Score,
+      latestScore: latestPlayer1Score,
+      setLatestScore: setLatestPlayer1Score,
+      scoreAnimationControl: player1ScoreAnimationControls,
+      handleScoreAnimation: handlePlayer1ScoreAnimations,
+      scoreDeductionAnimationControl: player1ScoreDeductionAnimationControls,
+      handleScoreDeductionAnimation: handlePlayer1ScoreDeductionAnimations,
       // haha
     },
     {
@@ -48,7 +95,13 @@ const MainPage = () => {
       attackCount: player2AttackCount,
       setAttackCount: setPlayer2AttackCount,
       score: player2Score,
-      setScore: setPlayer2Score
+      setScore: setPlayer2Score,
+      latestScore: latestPlayer2Score,
+      setLatestScore: setLatestPlayer2Score,
+      scoreAnimationControl: player2ScoreAnimationControls,
+      handleScoreAnimation: handlePlayer2ScoreAnimations,
+      scoreDeductionAnimationControl: player2ScoreDeductionAnimationControls,
+      handleScoreDeductionAnimation: handlePlayer2ScoreDeductionAnimations,
     },
   ];
 
@@ -58,6 +111,22 @@ const MainPage = () => {
   const listScoreboard = players.map((player, index) => 
     <div key={index} className={`text-white ${index===0 ? 'bg-nintendo-blue-500' : 'bg-nintendo-red-1'} flex-1 p-8 flex flex-col justify-center items-center gap-2`}>
       <h3 className='text-2xl'>SCORE</h3>
+      <motion.h1
+      className='text-green-400 font-xl absolute -mt-4'
+      variants={scoreAnimationVariants}
+      initial="initial"
+      animate={player.scoreAnimationControl}
+      >
+        {player.latestScore}
+      </motion.h1>
+      <motion.h1
+      className='text-nintendo-red-4 font-xl absolute -mt-4'
+      variants={scoreAnimationVariants}
+      initial="initial"
+      animate={player.scoreDeductionAnimationControl}
+      >
+        {attackDamage}
+      </motion.h1>
       <h1 className={`text-black font-bold text-4xl p-5 w-30 py-12 text-center bg-white border-8 border-black rounded-xl shadow-sm shadow-black`}>
         {player.score}
       </h1>
@@ -82,20 +151,19 @@ const MainPage = () => {
         const opponentIndex = index === 1 ? 0 : 1;
 
         if (player.control == event.code) {
-          player.setScore(s => s + pointRNG())
+          let point = pointRNG();
+          player.setLatestScore(point);
+          player.handleScoreAnimation();
+          player.setScore(s => s + point);
         }
 
         if (player.attack == event.code && player.attackCount != 0) {
-          players[opponentIndex].setScore(s => s - attackDamage)
-          player.setAttackCount(0)
+          players[opponentIndex].setScore(s => s - attackDamage);
+          players[opponentIndex].handleScoreDeductionAnimation();
+          player.setAttackCount(0);
         }
-
-        setTimeout(() => {
-
-        }, [])
       })
     }   
-
     
     window.addEventListener("keyup", handleAddScore); // add an event listener to listen to key presses
 
@@ -119,13 +187,13 @@ const MainPage = () => {
         // send the information to the Scoreboard component
         setWinnerInfo({
           winner: player.name,
-        })
+        });
 
         handleShowWinner();
         setIsPlaying(false);
       }
     }
-  }, [player1Score, player2Score])
+  }, [player1Score, player2Score]);
 
   const resetGame = () => {
     setIsPlaying(true);
@@ -291,8 +359,8 @@ const MainPage = () => {
         delay: .4
       }}
       className={`flex flex-row justify-between w-full`}>
-        <Player playerName={players[0].name} playerControl={"KeyW"} attackControl={"S"} playerNo={1}/>
-        <Player playerName={players[1].name} playerControl={"ArrowUp"} attackControl={"Down"} playerNo={2}/>
+        <Player playerName={players[0].name} playerControl={"KeyW"} playerControlDisplay={"W"} attackControl={"KeyS"} attackControlDisplay={"S"} playerNo={1}/>
+        <Player playerName={players[1].name} playerControl={"ArrowUp"} playerControlDisplay={"Up"} attackControl={"ArrowDown"} attackControlDisplay={"Down"} playerNo={2}/>
       </motion.div>
 
       <motion.div 

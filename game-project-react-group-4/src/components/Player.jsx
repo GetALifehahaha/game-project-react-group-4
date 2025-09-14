@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, useAnimationControls } from 'motion/react'
 
 const Player = (props) => {
-    const { playerName, playerControl, attackControl, playerNo } = props
+    const { playerName, playerControl, playerControlDisplay, attackControl, attackControlDisplay, playerNo } = props
     const [isClicked, setIsClicked] = useState(false);
 
     const buttonVariants = {
@@ -20,8 +20,10 @@ const Player = (props) => {
     useEffect(() => {
         const handleButtonAnimation = (event) => {
             if (event.code == playerControl) {
-                console.log("haha")
                 playerControlAnimation.start("jump");
+            }
+            if (event.code == attackControl) {
+                attackControlAnimation.start("jump")
             }
         }
 
@@ -43,7 +45,7 @@ const Player = (props) => {
                     variants={buttonVariants}
                     initial="initial"
                     animate={playerControlAnimation}
-                     className='bg-nintendo-blue-550 text-white aspect-square flex justify-center items-center rounded-full h-15 w-15'>{playerControl}</motion.h4>
+                     className='bg-nintendo-blue-550 text-white aspect-square flex justify-center items-center rounded-full h-15 w-15'>{playerControlDisplay}</motion.h4>
                 </button>
                 <div className='flex flex-col flex-1 aspect-square gap-0.5 bg-zinc-800 px-2 h-full'>
                     <div className='bg-gray-300 rounded-sm flex-1 h-100'></div>
@@ -56,7 +58,11 @@ const Player = (props) => {
                     <div className='bg-gray-300 rounded-sm flex-1 h-100'></div>
                 </div>
                 <button className='bg-zinc-800 aspect-square p-6'>
-                    <h4 className='text-sm bg-nintendo-red-2 text-white aspect-square flex justify-center items-center rounded-full h-15 w-15'>{attackControl}</h4>
+                    <motion.h4
+                    variants={buttonVariants}
+                    initial="initial"
+                    animate={attackControlAnimation}
+                    className='text-sm bg-nintendo-red-2 text-white aspect-square flex justify-center items-center rounded-full h-15 w-15'>{attackControlDisplay}</motion.h4>
                 </button>
             </div>
         </motion.div>
