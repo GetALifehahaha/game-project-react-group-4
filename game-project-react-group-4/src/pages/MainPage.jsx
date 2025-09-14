@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
 import Scoreboard from '../components/Scoreboard';
-import { motion } from 'motion/react'
+import { AnimatePresence, easeInOut, easeOut, motion, stagger } from 'motion/react'
 
 const MainPage = () => {
 
@@ -9,6 +9,9 @@ const MainPage = () => {
   const [isShowingWinner, setIsShowingWinner] = useState(false);
 
   // set a state variables for player 1 and player 2
+  const [player1Name, setPlayer1Name] = useState("Player 1");
+  const [player2Name, setPlayer2Name] = useState("Player 2");
+
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
@@ -17,6 +20,10 @@ const MainPage = () => {
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
 
   const [winnerInfo, setWinnerInfo] = useState({});
+  const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
+  const [settingsIsOpen, setSettingsIsOpen] = useState(false);
+
+  
 
   // a list of dictionaries
 
@@ -25,7 +32,7 @@ const MainPage = () => {
     // this is a dictionary or object in JavaScript for player 1
     // this contains the player name, key control, and the score which uses the state variables 
     {
-      name: "Lannour",
+      name: player1Name,
       control: "KeyW",
       attack: "KeyS",
       attackCount: player1AttackCount,
@@ -34,7 +41,7 @@ const MainPage = () => {
       setScore: setPlayer1Score
     },
     {
-      name: "Sencio",
+      name: player2Name,
       control: "ArrowUp",
       attack: "ArrowDown",
       attackCount: player2AttackCount,
@@ -48,14 +55,12 @@ const MainPage = () => {
   // map function for displaying the scoreboard.
   // design the scoreboard here
   const listScoreboard = players.map((player, index) => 
-    <div key={index} className='text-white'>
-      <h5 className='text-gray-500 font-semibold text-lg'>
-        {player.name} 
-      </h5>
-      <h1 className='text-white font-bold text-4xl p-5'>
+    <div key={index} className={`text-white ${index===0 ? 'bg-nintendo-blue-500' : 'bg-nintendo-red-1'} flex-1 p-8 flex flex-col justify-center items-center gap-2`}>
+      <h3 className='text-2xl'>SCORE</h3>
+      <h1 className={`text-black font-bold text-4xl p-5 w-30 py-12 text-center bg-white border-8 border-black rounded-xl shadow-sm shadow-black`}>
         {player.score}
       </h1>
-      </div>)
+    </div>)
 
   // an rng in gaining points
   const pointRNG = () => {
@@ -68,7 +73,7 @@ const MainPage = () => {
   useEffect(() => {
     const handleAddScore = (event) => { // a function that handles score changes
       
-      if (!isPlaying) { // if there's already a winner, no one is getting points anymore
+      if (!isPlaying || settingsIsOpen) {
         return;
       }
 
@@ -80,9 +85,13 @@ const MainPage = () => {
         }
 
         if (player.attack == event.code && player.attackCount != 0) {
-          players[opponentIndex].setScore(s => s - 5)
+          players[opponentIndex].setScore(s => s - attackDamage)
           player.setAttackCount(0)
         }
+
+        setTimeout(() => {
+
+        }, [])
       })
     }   
 
@@ -96,12 +105,12 @@ const MainPage = () => {
     return () => {
         window.removeEventListener("keyup", handleAddScore);
     }
-  }, [isPlaying, player1AttackCount, player2AttackCount]);
+  }, [isPlaying, settingsIsOpen, player1AttackCount, player2AttackCount]);
 
   // check for winners
   useEffect(() => {
     for (const player of players) { // iterate thru the list of players
-      // if the score of disctionary in the list
+      // if the score of dictionary in the list
       // render the name of the dictionary in the list
       // uhmmm sorry im bad english speak
       if (player.score >= 10) {
@@ -132,43 +141,163 @@ const MainPage = () => {
       setIsShowingWinner(false);
     }, 3000);
   }
-  // the renders in VDOM
+
+  const handleSetPlayer1Name = (event) => {
+    setPlayer1Name(event.target.value)
+  }
+  
+  const handleSetPlayer2Name = (event) => {
+    setPlayer2Name(event.target.value)
+  }
+
+  const handleSetScoreboardIsOpen = () => {
+    setScoreboardIsOpen(!scoreboardIsOpen);
+  }
+
+  const handleSetSettingsIsOpen = () => {
+    setSettingsIsOpen(!settingsIsOpen);
+  }
+    // the renders in VDOM
   return (
-    <div className='w-full flex flex-col items-center'>
-      <Scoreboard winnerInfo={winnerInfo}/>
+    <div className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center'>
+      <AnimatePresence>
+        {settingsIsOpen && 
+          <motion.div 
+          initial={{opacity: 0, translateX: '-5vw'}}
+          animate={{opacity: 1, translateX: 0}}
+          exit={{opacity: 0, translate: '-5vw'}}
+          transition={{duration: .2, ease: 'anticipate'}}
+          className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
+            <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
 
-      {isShowingWinner && 
-      <motion.div
+            <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
+              <h1 className='text-gray-400 pb-2'>Name</h1>
+              <label for='player1Name' className='text-sm text-black'>Set Player 1 Name</label>
+              <input type="text" id='player1Name' placeholder='Input player 1 name' maxLength='8'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetPlayer1Name(e)}
+                value={player1Name}/>
+              <label for='player1Name' className='text-sm text-black'>Set Player 2 Name</label>
+              <input type="text" id='player2Name' placeholder='Input player 2 name' maxLength='8'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetPlayer2Name(e)}
+                value={player2Name}
+                />
+            </div>
+          </motion.div>
+        }
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {scoreboardIsOpen && 
+          <Scoreboard winnerInfo={winnerInfo}/>
+        }
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isShowingWinner && 
+          <motion.div
+          initial={{
+            opacity: 0,
+            translateY: 0
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 20
+          }}
+          exit={{
+            opacity: 0,
+            translateY: 0
+          }}
+          transition={{
+            duration: .5,
+            ease: 'easeInOut'
+          }}
+          className='absolute top-10 flex flex-col px-40 py-2 bg-stone-950 rounded-xl items-center'>
+            <h5 className='font-semibold text-gray-700'>
+              Winner: 
+            </h5>
+            <h2 className='font-bold text-green-400 text-4xl'>
+              {winnerInfo.winner}
+            </h2>
+        </motion.div>}
+      </AnimatePresence>
+
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
       animate={{
-        translateY: 20
+        translateY: 0,
+        opacity: 1
       }}
-      exit={{
-        translateY: 0
+      transition={{
+        duration: .5,
+        ease: 'backOut'
       }}
-      className='absolute top-10 flex flex-col px-40 py-2 bg-stone-950 rounded-xl items-center'>
-        <h5 className='font-semibold text-gray-700'>
-          Winner: 
-        </h5>
-        <h2 className='font-bold text-green-400 text-4xl'>
-          {winnerInfo.winner}
-        </h2>
-      </motion.div>}
+      className='bg-black w-full p-4 flex justify-evenly items-center'>
+        <button onClick={resetGame} className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</button>
+        <button className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' onClick={handleSetScoreboardIsOpen}>SCOREBOARD</button>
+      </motion.div>
 
-      <div 
-      className='flex flex-row mt-20 w-[50vw] justify-between mx-auto'>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .2
+      }}
+      className='flex flex-row bg-white w-full justify-between mx-auto'>
         {listScoreboard}
-      </div>
+      </motion.div>
 
-      <div className='flex flex-row justify-between text-2xl font-bold text-white mt-[20vh] w-[50vw] mx-auto'>
-        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"}/>
-        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"}/>
-      </div>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .4
+      }}
+      className={`flex flex-row justify-between w-full`}>
+        <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"} playerNo={1}/>
+        <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"} playerNo={2}/>
+      </motion.div>
 
-      <button 
-      onClick={resetGame}
-      className='bg-orange-400 text-black font-semibold p-2 mt-5 rounded-xl cursor-pointer
-                  absolute left-0 top-10 m-2
-      '>RESET</button>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .6
+      }}
+      className='h-auto w-full bg-black p-2 flex justify-center items-center'>
+        <button 
+        className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
+        onClick={handleSetSettingsIsOpen}
+        >Settings</button>
+      </motion.div>
     </div>
   )
 }

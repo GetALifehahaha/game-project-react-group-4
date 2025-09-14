@@ -1,20 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 
 const Scoreboard = (props) => {
     const { winnerInfo } = props
-    const [scoreboardHistory, setScoreboardHistory] = useState([
-    ]);
-    const [isOpen, setIsOpen] = useState(false);
+    const [scoreboardHistory, setScoreboardHistory] = useState([]);
 
     const handleSetScoreboardHistory = () => {
         setScoreboardHistory(sh => [...sh, winnerInfo])
     }
-
-    const handleSetIsOpen = () => {
-      setIsOpen(!isOpen);
-    }
-
     const listScoreboard = scoreboardHistory.map((scoreResult, index) => 
     <h1 key={index} className='px-2 py-1 rounded-lg mb-2 font-bold text-black text-left'>
         {scoreResult.winner}
@@ -27,17 +20,30 @@ const Scoreboard = (props) => {
   return (
 
     <>
-      <button className='text-black font-semibold absolute left-0 m-2 p-2 bg-white rounded-xl cursor-pointer' onClick={handleSetIsOpen}>SCOREBOARD</button>
-      { isOpen && 
-      <motion.div 
+      <motion.div
+      initial={{
+        translateX: '5vw',
+        opacity: 0
+      }}
+      animate={{
+        translateX: 0,
+        opacity: 1
+      }}
+      exit={{
+        translateX: '5vw',
+        opacity: 0
+      }}
+      transition={{
+        duration: .2,
+        ease: 'anticipate'
+      }} 
       className='text-white absolute right-0 p-4 w-[20vw] h-full bg-white'>
-        <h3 className='text-black font-semibold text-2xl text-center'>Scoreboard</h3>
-        <h5 className='text-gray-600 font-semibold'>Winners</h5>
-        <div className='overflow-auto h-[80vh] bg-white p-2 shadow-md'>
+        <h3 className='text-black font-semibold text-xl text-center pb-4'>Scoreboard</h3>
+        <h5 className='text-gray-400 font-semibold pb-4'>Winners</h5>
+        <div className='overflow-auto h-[80vh] bg-gray-100 py-4 px-1 rounded-sm shadow-sm'>
           {listScoreboard}
         </div>
       </motion.div>
-      }
     </>
   )
 }
