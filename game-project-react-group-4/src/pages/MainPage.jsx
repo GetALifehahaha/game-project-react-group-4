@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
 import Scoreboard from '../components/Scoreboard';
-import { motion } from 'motion/react'
+import { AnimatePresence, easeInOut, easeOut, motion, stagger } from 'motion/react'
 
 const MainPage = () => {
 
@@ -85,9 +85,13 @@ const MainPage = () => {
         }
 
         if (player.attack == event.code && player.attackCount != 0) {
-          players[opponentIndex].setScore(s => s - 5)
+          players[opponentIndex].setScore(s => s - attackDamage)
           player.setAttackCount(0)
         }
+
+        setTimeout(() => {
+
+        }, [])
       })
     }   
 
@@ -106,7 +110,7 @@ const MainPage = () => {
   // check for winners
   useEffect(() => {
     for (const player of players) { // iterate thru the list of players
-      // if the score of disctionary in the list
+      // if the score of dictionary in the list
       // render the name of the dictionary in the list
       // uhmmm sorry im bad english speak
       if (player.score >= 10) {
@@ -155,66 +159,145 @@ const MainPage = () => {
   }
     // the renders in VDOM
   return (
-    <div className='w-full flex flex-col items-center'>
-      {settingsIsOpen && 
-        <div className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
-          <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
+    <div className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center'>
+      <AnimatePresence>
+        {settingsIsOpen && 
+          <motion.div 
+          initial={{opacity: 0, translateX: '-5vw'}}
+          animate={{opacity: 1, translateX: 0}}
+          exit={{opacity: 0, translate: '-5vw'}}
+          transition={{duration: .2, ease: 'anticipate'}}
+          className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
+            <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
 
-          <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
-            <h1 className='text-gray-400 pb-2'>Name</h1>
-            <label for='player1Name' className='text-sm text-black'>Set Player 1 Name</label>
-            <input type="text" id='player1Name' placeholder='Input player 1 name' 
-              className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 text-black outline-none focus:border-nintendo-blue-500'
-              onChange={(e) => handleSetPlayer1Name(e)}/>
-            <label for='player1Name' className='text-sm text-black'>Set Player 2 Name</label>
-            <input type="text" id='player2Name' placeholder='Input player 2 name' 
-              className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 text-black outline-none focus:border-nintendo-blue-500'
-              onChange={(e) => handleSetPlayer2Name(e)}
-            />
-          </div>
-        </div>
-      }
-      {scoreboardIsOpen && 
-        <Scoreboard winnerInfo={winnerInfo}/>
-      }
+            <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
+              <h1 className='text-gray-400 pb-2'>Name</h1>
+              <label for='player1Name' className='text-sm text-black'>Set Player 1 Name</label>
+              <input type="text" id='player1Name' placeholder='Input player 1 name' maxLength='8'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetPlayer1Name(e)}
+                value={player1Name}/>
+              <label for='player1Name' className='text-sm text-black'>Set Player 2 Name</label>
+              <input type="text" id='player2Name' placeholder='Input player 2 name' maxLength='8'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetPlayer2Name(e)}
+                value={player2Name}
+                />
+            </div>
+          </motion.div>
+        }
+      </AnimatePresence>
 
-      {isShowingWinner && 
-      <motion.div
+      <AnimatePresence>
+        {scoreboardIsOpen && 
+          <Scoreboard winnerInfo={winnerInfo}/>
+        }
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isShowingWinner && 
+          <motion.div
+          initial={{
+            opacity: 0,
+            translateY: 0
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 20
+          }}
+          exit={{
+            opacity: 0,
+            translateY: 0
+          }}
+          transition={{
+            duration: .5,
+            ease: 'easeInOut'
+          }}
+          className='absolute top-10 flex flex-col px-40 py-2 bg-stone-950 rounded-xl items-center'>
+            <h5 className='font-semibold text-gray-700'>
+              Winner: 
+            </h5>
+            <h2 className='font-bold text-green-400 text-4xl'>
+              {winnerInfo.winner}
+            </h2>
+        </motion.div>}
+      </AnimatePresence>
+
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
       animate={{
-        translateY: 20
+        translateY: 0,
+        opacity: 1
       }}
-      exit={{
-        translateY: 0
+      transition={{
+        duration: .5,
+        ease: 'backOut'
       }}
-      className='absolute top-10 flex flex-col px-40 py-2 bg-stone-950 rounded-xl items-center'>
-        <h5 className='font-semibold text-gray-700'>
-          Winner: 
-        </h5>
-        <h2 className='font-bold text-green-400 text-4xl'>
-          {winnerInfo.winner}
-        </h2>
-      </motion.div>}
-
-      <div className='bg-black w-full p-4 flex justify-evenly items-center'>
+      className='bg-black w-full p-4 flex justify-evenly items-center'>
         <button onClick={resetGame} className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</button>
         <button className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' onClick={handleSetScoreboardIsOpen}>SCOREBOARD</button>
-      </div>
+      </motion.div>
 
-      <div className='flex flex-row bg-white w-full justify-between mx-auto'>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .2
+      }}
+      className='flex flex-row bg-white w-full justify-between mx-auto'>
         {listScoreboard}
-      </div>
+      </motion.div>
 
-      <div className={`flex flex-row justify-between w-full`}>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .4
+      }}
+      className={`flex flex-row justify-between w-full`}>
         <Player playerName={players[0].name} playerControl={"W"} attackControl={"S"} playerNo={1}/>
         <Player playerName={players[1].name} playerControl={"Up"} attackControl={"Down"} playerNo={2}/>
-      </div>
+      </motion.div>
 
-      <div className='h-auto w-full bg-black p-2 flex justify-center items-center'>
+      <motion.div 
+      initial={{
+        translateY: '5vh',
+        opacity: 0
+      }}
+      animate={{
+        translateY: 0,
+        opacity: 1
+      }}
+      transition={{
+        duration: .5,
+        ease: 'backOut',
+        delay: .6
+      }}
+      className='h-auto w-full bg-black p-2 flex justify-center items-center'>
         <button 
         className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
         onClick={handleSetSettingsIsOpen}
         >Settings</button>
-      </div>
+      </motion.div>
     </div>
   )
 }

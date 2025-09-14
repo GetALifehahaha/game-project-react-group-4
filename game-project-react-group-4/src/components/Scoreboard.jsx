@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 
 const Scoreboard = (props) => {
     const { winnerInfo } = props
@@ -20,14 +20,30 @@ const Scoreboard = (props) => {
   return (
 
     <>
-      <div 
+      <motion.div
+      initial={{
+        translateX: '5vw',
+        opacity: 0
+      }}
+      animate={{
+        translateX: 0,
+        opacity: 1
+      }}
+      exit={{
+        translateX: '5vw',
+        opacity: 0
+      }}
+      transition={{
+        duration: .2,
+        ease: 'anticipate'
+      }} 
       className='text-white absolute right-0 p-4 w-[20vw] h-full bg-white'>
         <h3 className='text-black font-semibold text-xl text-center pb-4'>Scoreboard</h3>
         <h5 className='text-gray-400 font-semibold pb-4'>Winners</h5>
         <div className='overflow-auto h-[80vh] bg-gray-100 py-4 px-1 rounded-sm shadow-sm'>
           {listScoreboard}
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }
