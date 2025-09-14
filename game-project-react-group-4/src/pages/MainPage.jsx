@@ -38,7 +38,8 @@ const MainPage = () => {
       attackCount: player1AttackCount,
       setAttackCount: setPlayer1AttackCount,
       score: player1Score,
-      setScore: setPlayer1Score
+      setScore: setPlayer1Score 
+      // haha
     },
     {
       name: player2Name,
