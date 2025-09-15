@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Player from '../components/Player'
 import Scoreboard from '../components/Scoreboard';
-import { AnimatePresence, motion, useAnimationControls } from 'motion/react'
+import { AnimatePresence, motion, useAnimationControls, stagger, scale } from 'motion/react'
 
 const MainPage = () => {
 
@@ -22,21 +22,24 @@ const MainPage = () => {
   const [player1AttackCount, setPlayer1AttackCount] = useState(1);
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
 
-  const [winnerInfo, setWinnerInfo] = useState({});
+  const [listOfWinners, setListOfWinners] = useState([]);
+  const [winnerName, setWinnerName] = useState("");
   const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
   const [settingsIsOpen, setSettingsIsOpen] = useState(false);
 
   const scoreAnimationVariants = {
     initial: {
+      scale: 1,
       opacity: 0,
       y: 0,
     },
     show: {
+      scale: [2, 1],
       opacity: [1, 0],
       y: [0, -20],
 
       transition: {
-        duration: '0.2',
+        duration: '0.3',
         ease: 'easeOut'
       }
     },
@@ -181,9 +184,8 @@ const MainPage = () => {
       // uhmmm sorry im bad english speak
       if (player.score >= 10) {
 
-        setWinnerInfo({
-          winner: player.name,
-        });
+        setListOfWinners(winner => [...winner, player.name]);
+        setWinnerName(player.name);
 
         handleShowWinner();
         setIsPlaying(false);
@@ -224,14 +226,26 @@ const MainPage = () => {
   }
     // the renders in VDOM
   return (
-    <div className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center relative'>
+    <motion.div
+    variants={{
+      hidden: {
+        opacity: 0,
+      },
+      show: {
+        opacity: 1,
+        transition: {
+          delayChildren: stagger(0.25),
+        }
+      }
+    }}
+    initial="hidden"
+    animate="show"
+     className='w-full h-100vh overflow-x-hidden overflow-y-hidden flex flex-col items-center relative'>
+
+      {/* Settings Sidebar */}
       <AnimatePresence>
         {settingsIsOpen && 
           <motion.div 
-          initial={{opacity: 0, translateX: '-5vw'}}
-          animate={{opacity: 1, translateX: 0}}
-          exit={{opacity: 0, translate: '-5vw'}}
-          transition={{duration: .2, ease: 'anticipate'}}
           className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
             <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
 
@@ -252,13 +266,15 @@ const MainPage = () => {
           </motion.div>
         }
       </AnimatePresence>
-
+        
+      {/* Scoreboard Sidebar */}
       <AnimatePresence>
         {scoreboardIsOpen && 
-          <Scoreboard winnerInfo={winnerInfo}/>
+          <Scoreboard winnerList={listOfWinners}/>
         }
       </AnimatePresence>
 
+      {/* Winner Popup */}
       <AnimatePresence>
         {isShowingWinner && 
           <motion.div
@@ -283,97 +299,39 @@ const MainPage = () => {
               Winner: 
             </h5>
             <h2 className='font-bold text-green-400 text-4xl'>
-              {winnerInfo.winner}
+              {winnerName}
             </h2>
         </motion.div>}
       </AnimatePresence>
-
+      
+      {/* Title */}
       <motion.div 
-      initial={{
-        translateY: '5vh',
-        opacity: 0
-      }}
-      animate={{
-        translateY: 0,
-        opacity: 1
-      }}
-      transition={{
-        duration: .5,
-        ease: 'backOut'
-      }}
-      className='bg-black w-full p-4 flex justify-evenly items-center'>
-        <motion.button 
-        onClick={resetGame}
-        whileHover={{
-          scale: 1.1
-        }} 
-        whileTap={{
-          y: -5
-        }}
-        className='bg-nintendo-red-5 text-white font-semibold p-4 rounded-xl cursor-pointer w-[20vw]'>RESET</motion.button>
-        <motion.button
-        whileHover={{
-          scale: 1.1,
-        }}
-        whileTap={{
-          y: -5
-        }}
-         className='text-black font-semibold p-4 bg-white rounded-xl cursor-pointer w-[20vw]' 
-         onClick={handleSetScoreboardIsOpen}>SCOREBOARD</motion.button>
+      variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
+      className='bg-black w-full p-2 flex justify-evenly items-center'>
+        <h1
+        className='text-4xl text-white tracking-tight'
+        >COUNTER GAME</h1>
       </motion.div>
-
+      
+      {/* Score */}
       <motion.div 
-      initial={{
-        translateY: '5vh',
-        opacity: 0
-      }}
-      animate={{
-        translateY: 0,
-        opacity: 1
-      }}
-      transition={{
-        duration: .5,
-        ease: 'backOut',
-        delay: .2
-      }}
+      variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
       className='flex flex-row bg-white w-full justify-between mx-auto'>
         {listScoreboard}
       </motion.div>
 
+      {/* Players */}
       <motion.div 
-      initial={{
-        translateY: '5vh',
-        opacity: 0
-      }}
-      animate={{
-        translateY: 0,
-        opacity: 1
-      }}
-      transition={{
-        duration: .5,
-        ease: 'backOut',
-        delay: .4
-      }}
+      variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
       className={`flex flex-row justify-between w-full`}>
         <Player playerName={players[0].name} playerControl={"KeyW"} playerControlDisplay={"W"} attackControl={"KeyS"} attackControlDisplay={"S"} playerNo={1}/>
         <Player playerName={players[1].name} playerControl={"ArrowUp"} playerControlDisplay={"Up"} attackControl={"ArrowDown"} attackControlDisplay={"Down"} playerNo={2}/>
       </motion.div>
 
+      {/* Buttons */}
       <motion.div 
-      initial={{
-        translateY: '5vh',
-        opacity: 0
-      }}
-      animate={{
-        translateY: 0,
-        opacity: 1
-      }}
-      transition={{
-        duration: .5,
-        ease: 'backOut',
-        delay: .6
-      }}
-      className='h-auto w-full bg-black p-2 flex justify-center items-center'>
+      variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
+      className='h-auto w-full bg-black p-2 flex justify-center gap-4 items-center'>
         <motion.button 
         className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
         onClick={handleSetSettingsIsOpen}
@@ -384,8 +342,26 @@ const MainPage = () => {
           y: -5
         }}
         >Settings</motion.button>
+        <motion.button 
+        onClick={resetGame}
+        whileHover={{
+          scale: 1.1
+        }} 
+        whileTap={{
+          y: -5
+        }}
+        className='py-1 px-4 bg-nintendo-red-4 text-black text-sm rounded-2xl cursor-pointer'>RESET</motion.button>
+        <motion.button
+        whileHover={{
+          scale: 1.1,
+        }}
+        whileTap={{
+          y: -5
+        }}
+         className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer' 
+         onClick={handleSetScoreboardIsOpen}>SCOREBOARD</motion.button>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
 

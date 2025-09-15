@@ -2,21 +2,12 @@ import React, { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 const Scoreboard = (props) => {
-    const { winnerInfo } = props
-    const [scoreboardHistory, setScoreboardHistory] = useState([]);
-
-    const handleSetScoreboardHistory = () => {
-      if (!winnerInfo) return;
-      setScoreboardHistory(sh => [...sh, winnerInfo])
-    }
-    const listScoreboard = scoreboardHistory.map((scoreResult, index) => (
+    const { winnerList } = props
+    
+    const listWinner = winnerList.map((winner, index) => (
     <h1 key={index} className='px-2 py-1 rounded-lg mb-2 font-bold text-black text-left'>
-        {scoreResult.winner}
+        {winner}
     </h1>))
-
-    useEffect(() => {
-        handleSetScoreboardHistory()
-    }, [winnerInfo])
 
   return (
 
@@ -42,7 +33,7 @@ const Scoreboard = (props) => {
         <h3 className='text-black font-semibold text-xl text-center pb-4'>Scoreboard</h3>
         <h5 className='text-gray-400 font-semibold pb-4'>Winners</h5>
         <div className='overflow-auto h-[80vh] bg-gray-100 py-4 px-1 rounded-sm shadow-sm'>
-          {listScoreboard}
+          {listWinner}
         </div>
       </motion.div>
     </>

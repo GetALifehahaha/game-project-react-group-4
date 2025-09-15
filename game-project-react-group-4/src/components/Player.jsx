@@ -3,7 +3,6 @@ import { motion, useAnimationControls } from 'motion/react'
 
 const Player = (props) => {
     const { playerName, playerControl, playerControlDisplay, attackControl, attackControlDisplay, playerNo } = props
-    const [isClicked, setIsClicked] = useState(false);
 
     const buttonVariants = {
         initial: {
