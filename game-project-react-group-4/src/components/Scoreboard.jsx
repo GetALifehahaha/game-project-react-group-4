@@ -6,7 +6,7 @@ const Scoreboard = (props) => {
     
     const listWinner = winnerList.map((winner, index) => (
     <h1 key={index} className='px-2 py-1 rounded-lg mb-2 font-bold text-black text-left'>
-        {winner}
+        {index+1}. {winner}
     </h1>))
 
   return (

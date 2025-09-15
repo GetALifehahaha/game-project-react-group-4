@@ -18,10 +18,11 @@ const MainPage = () => {
   const [latestPlayer1Score, setLatestPlayer1Score] = useState(0);
   const [latestPlayer2Score, setLatestPlayer2Score] = useState(0);
 
-  const attackDamage = 5;
+  const [attackDamage, setAttackDamage] = useState(5);
   const [player1AttackCount, setPlayer1AttackCount] = useState(1);
   const [player2AttackCount, setPlayer2AttackCount] = useState(1);
 
+  const [targetScore, setTargetScore] = useState(10);
   const [listOfWinners, setListOfWinners] = useState([]);
   const [winnerName, setWinnerName] = useState("");
   const [scoreboardIsOpen, setScoreboardIsOpen] = useState(false);
@@ -86,7 +87,6 @@ const MainPage = () => {
       handleScoreAnimation: handlePlayer1ScoreAnimations,
       scoreDeductionAnimationControl: player1ScoreDeductionAnimationControls,
       handleScoreDeductionAnimation: handlePlayer1ScoreDeductionAnimations,
-      // haha
     },
     {
       name: player2Name,
@@ -178,11 +178,8 @@ const MainPage = () => {
 
   // check for winners
   useEffect(() => {
-    for (const player of players) { // iterate thru the list of players
-      // if the score of dictionary in the list
-      // render the name of the dictionary in the list
-      // uhmmm sorry im bad english speak
-      if (player.score >= 10) {
+    for (const player of players) {
+      if (player.score >= targetScore) {
 
         setListOfWinners(winner => [...winner, player.name]);
         setWinnerName(player.name);
@@ -201,6 +198,8 @@ const MainPage = () => {
     })
   }
 
+
+  // handle functions
   const handleShowWinner = () => {
     setIsShowingWinner(true);
 
@@ -224,8 +223,17 @@ const MainPage = () => {
   const handleSetSettingsIsOpen = () => {
     setSettingsIsOpen(!settingsIsOpen);
   }
+
+  const handleSetAttackDamage = (event) => {
+    setAttackDamage(event.target.value);
+  }
+
+  const handleSetTargetScore = (event) => {
+    setTargetScore(event.target.value);
+  }
     // the renders in VDOM
   return (
+    // the main fragment
     <motion.div
     variants={{
       hidden: {
@@ -246,21 +254,51 @@ const MainPage = () => {
       <AnimatePresence>
         {settingsIsOpen && 
           <motion.div 
+          initial={{
+            translateX: '-5vw',
+            opacity: 0
+          }}
+          animate={{
+            translateX: 0,
+            opacity: 1
+          }}
+          exit={{
+            translateX: '-5vw',
+            opacity: 0
+          }}
+          transition={{
+            duration: .2,
+            ease: 'anticipate'
+          }} 
           className='text-white absolute left-0 p-4 w-[20vw] h-full bg-white'>
             <h1 className='text-black font-semibold text-xl text-center pb-4'>Settings</h1>
 
             <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
               <h1 className='text-gray-400 pb-2'>Name</h1>
-              <label for='player1Name' className='text-sm text-black'>Set Player 1 Name</label>
+              <label className='text-sm text-black'>Set Player 1 Name</label>
               <input type="text" id='player1Name' placeholder='Input player 1 name' maxLength='8'
                 className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
                 onChange={(e) => handleSetPlayer1Name(e)}
                 value={player1Name}/>
-              <label for='player1Name' className='text-sm text-black'>Set Player 2 Name</label>
+              <label className='text-sm text-black'>Set Player 2 Name</label>
               <input type="text" id='player2Name' placeholder='Input player 2 name' maxLength='8'
                 className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
                 onChange={(e) => handleSetPlayer2Name(e)}
                 value={player2Name}
+                />
+            </div>
+            <div className='py-4 px-1 bg-gray-100 rounded-sm shadow-md flex flex-col gap-2'>
+              <h1 className='text-gray-400 pb-2'>Game Settings</h1>
+              <label className='text-sm text-black'>Set Attack Damage</label>
+              <input type="number" placeholder='Input attack damage' max='10'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetAttackDamage(e)}
+                value={attackDamage}/>
+              <label className='text-sm text-black'>Set Target Score</label>
+              <input type="number" placeholder='Input target score' max='100'
+                className='border-b-2 border-gray-800 pb-2 w-full text-sm placeholder-gray-400 px-2 duration-200 ease-in text-black outline-none focus:border-nintendo-blue-500'
+                onChange={(e) => handleSetTargetScore(e)}
+                value={targetScore}
                 />
             </div>
           </motion.div>
@@ -307,7 +345,7 @@ const MainPage = () => {
       {/* Title */}
       <motion.div 
       variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
-      className='bg-black w-full p-2 flex justify-evenly items-center'>
+      className='bg-black w-full p-4 flex justify-evenly items-center'>
         <h1
         className='text-4xl text-white tracking-tight'
         >COUNTER GAME</h1>
@@ -331,7 +369,7 @@ const MainPage = () => {
       {/* Buttons */}
       <motion.div 
       variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
-      className='h-auto w-full bg-black p-2 flex justify-center gap-4 items-center'>
+      className='h-auto w-full bg-black p-4 flex justify-center gap-4 items-center'>
         <motion.button 
         className='py-1 px-4 bg-white text-black text-sm rounded-2xl cursor-pointer'
         onClick={handleSetSettingsIsOpen}
