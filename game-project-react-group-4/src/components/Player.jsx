@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, scale, useAnimationControls } from 'motion/react'
 
 const Player = (props) => {
-    const { playerName, playerControl, playerControlDisplay, attackControl, attackControlDisplay, playerNo } = props
+    const { playerName, playerControl, playerControlDisplay, attackControl, attackControlDisplay, playerNo, isAnySidebarOpen} = props
 
     const buttonVariants = {
         initial: {
@@ -19,6 +19,7 @@ const Player = (props) => {
 
     useEffect(() => {
         const handleButtonAnimation = (event) => {
+            if (isAnySidebarOpen) return;
             if (event.code == playerControl) {
                 playerControlAnimation.start("jump");
             }
@@ -30,7 +31,7 @@ const Player = (props) => {
         window.addEventListener("keyup", handleButtonAnimation);
 
         return () => {window.removeEventListener("keyup", handleButtonAnimation)};
-    }, [])
+    }, [isAnySidebarOpen])
 
     // design the player cards
     return (

@@ -143,7 +143,7 @@ const MainPage = () => {
   useEffect(() => {
     const handleAddScore = (event) => { // a function that handles score changes
       
-      if (!isPlaying || settingsIsOpen) {
+      if (!isPlaying || settingsIsOpen || scoreboardIsOpen) {
         return;
       }
 
@@ -174,7 +174,7 @@ const MainPage = () => {
     return () => {
         window.removeEventListener("keyup", handleAddScore);
     }
-  }, [isPlaying, settingsIsOpen, player1AttackCount, player2AttackCount]);
+  }, [isPlaying, settingsIsOpen, player1AttackCount, player2AttackCount, scoreboardIsOpen]);
 
   // check for winners
   useEffect(() => {
@@ -362,8 +362,8 @@ const MainPage = () => {
       <motion.div 
       variants={{hidden: {opacity: 0, y: 15}, show: { opacity:1, y: 0}}}
       className={`flex flex-row justify-between w-full`}>
-        <Player playerName={players[0].name} playerControl={"KeyW"} playerControlDisplay={"W"} attackControl={"KeyS"} attackControlDisplay={"S"} playerNo={1}/>
-        <Player playerName={players[1].name} playerControl={"ArrowUp"} playerControlDisplay={"Up"} attackControl={"ArrowDown"} attackControlDisplay={"Down"} playerNo={2}/>
+        <Player playerName={players[0].name} playerControl={"KeyW"} playerControlDisplay={"W"} attackControl={"KeyS"} attackControlDisplay={"S"} playerNo={1} isAnySidebarOpen={settingsIsOpen || scoreboardIsOpen}/>
+        <Player playerName={players[1].name} playerControl={"ArrowUp"} playerControlDisplay={"Up"} attackControl={"ArrowDown"} attackControlDisplay={"Down"} playerNo={2} isAnySidebarOpen={settingsIsOpen || scoreboardIsOpen}/>
       </motion.div>
 
       {/* Buttons */}
